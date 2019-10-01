@@ -25,13 +25,13 @@ template.close()
 testloader = data.DataLoader(HandTestSet('data/cropped', img_transform=img_transform),
                             num_workers=0,batch_size=1, shuffle=False, pin_memory=False)
 
-model = torch.nn.DataParallel(resnet34_Mano(input_option=input_option))    
-model.load_state_dict(torch.load('data/model-' + str(input_option) + '.pth'))
+model = torch.nn.DataParallel(resnet34_Mano(input_option=input_option))
+model.load_state_dict(torch.load('data/model-' + str(input_option) + '.pth', map_location='cpu'))
 model.eval()
 
 for i, data in enumerate(testloader, 0):
     images = data
-    images = Variable(images.cuda())
+    images = Variable(images)
     out1, out2 = model(images)    
     imgs = images[0].data        
 
@@ -41,10 +41,10 @@ for i, data in enumerate(testloader, 0):
     for ii in xrange(21): 
         u[ii] = out1[0,2*ii]
         v[ii] = out1[0,2*ii+1]                           
-    plt.plot(u, v, 'ro', markersize=5)      
-    fig = plt.figure(1)
-    plt.imshow(imgs[:3,:,:].permute(1,2,0))
-    plt.show()
+    #plt.plot(u, v, 'ro', markersize=5)      
+    #fig = plt.figure(1)
+    #plt.imshow(imgs[:3,:,:].permute(1,2,0))
+    #plt.show()
 
     # Save 3D mesh
     file1 = open('data/out/'+str(i)+'.obj','w')   
